@@ -32,37 +32,40 @@ import {
   Users,
 } from 'lucide-react';
 
-// ─── SIGNUP MODAL ───────────────────────────────────────────────────────────
+// ─── LEAD CAPTURE MODAL ─────────────────────────────────────────────────────
 
-function SignupModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function LeadModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [plan, setPlan] = useState<'monthly' | 'annual'>('monthly');
+  const [phone, setPhone] = useState('');
+  const [zip, setZip] = useState('');
+  const [firstFix, setFirstFix] = useState('');
+  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleCheckout = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !name) return;
     setLoading(true);
     setError('');
 
     try {
-      const res = await fetch('/api/checkout', {
+      const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan, email }),
+        body: JSON.stringify({ name, email, phone, zip, firstFix }),
       });
 
-      const data = await res.json();
-
-      if (data.url) {
-        window.location.href = data.url;
+      if (res.ok) {
+        setSubmitted(true);
       } else {
+        const data = await res.json();
         setError(data.error || 'Something went wrong. Please try again.');
-        setLoading(false);
       }
     } catch {
       setError('Network error. Please try again.');
+    } finally {
       setLoading(false);
     }
   };
@@ -71,8 +74,12 @@ function SignupModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
   useEffect(() => {
     if (!isOpen) {
       setTimeout(() => {
+        setName('');
         setEmail('');
-        setPlan('monthly');
+        setPhone('');
+        setZip('');
+        setFirstFix('');
+        setSubmitted(false);
         setError('');
       }, 300);
     }
@@ -98,9 +105,9 @@ function SignupModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[101] flex items-center justify-center px-6"
+            className="fixed inset-0 z-[101] flex items-center justify-center px-6 overflow-y-auto py-8"
           >
-            <div className="relative w-full max-w-md bg-[#151515] border border-[#2a2a2a] rounded-2xl p-8 sm:p-10">
+            <div className="relative w-full max-w-md bg-[#151515] border border-[#2a2a2a] rounded-2xl p-8 sm:p-10 my-auto">
               {/* Close */}
               <button
                 onClick={onClose}
@@ -109,122 +116,137 @@ function SignupModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                 <X className="h-5 w-5" />
               </button>
 
-              {/* Header */}
-              <div className="mb-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#e8a838]/10 border border-[#e8a838]/20 rounded-full mb-4">
-                  <Sparkles className="h-3 w-3 text-[#e8a838]" />
-                  <span className="text-[9px] uppercase tracking-[0.2em] text-[#e8a838] font-semibold">
-                    Founding Member
-                  </span>
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-bold text-[#f5f0e8] tracking-tight mb-2">
-                  Join the club.
-                </h3>
-                <p className="text-sm text-[#888880] font-light leading-relaxed">
-                  Founding members lock in $99/mo for life.
-                  Your first month is free.
-                </p>
-              </div>
-
-              {/* Plan toggle */}
-              <div className="flex bg-[#0a0a0a] rounded-xl p-1 mb-5">
-                <button
-                  onClick={() => setPlan('monthly')}
-                  className={`flex-1 py-2.5 rounded-lg text-xs uppercase tracking-widest font-semibold transition-all ${
-                    plan === 'monthly'
-                      ? 'bg-[#1e1e1e] text-[#f5f0e8] shadow-sm'
-                      : 'text-[#555] hover:text-[#888880]'
-                  }`}
-                >
-                  $99/mo
-                </button>
-                <button
-                  onClick={() => setPlan('annual')}
-                  className={`flex-1 py-2.5 rounded-lg text-xs uppercase tracking-widest font-semibold transition-all relative ${
-                    plan === 'annual'
-                      ? 'bg-[#1e1e1e] text-[#f5f0e8] shadow-sm'
-                      : 'text-[#555] hover:text-[#888880]'
-                  }`}
-                >
-                  $84/mo
-                  <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-[#e8a838] text-[#0a0a0a] text-[7px] uppercase tracking-wider font-bold rounded-full">
-                    -15%
-                  </span>
-                </button>
-              </div>
-
-              {/* Plan details */}
-              <div className="mb-5 p-3 bg-[#0a0a0a] rounded-xl border border-[#1e1e1e]">
-                <div className="flex items-baseline justify-between">
-                  <div>
-                    <span className="text-2xl font-bold text-[#f5f0e8]">
-                      ${plan === 'annual' ? '84' : '99'}
-                    </span>
-                    <span className="text-sm text-[#888880]">/mo</span>
-                  </div>
-                  <span className="text-[10px] text-[#888880]">
-                    {plan === 'annual' ? 'Billed $1,008/yr' : 'Billed monthly'}
-                  </span>
-                </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {['1 visit/mo', '2 hrs each', 'Same handyman', 'Cancel anytime'].map(
-                    (perk) => (
-                      <span
-                        key={perk}
-                        className="text-[9px] uppercase tracking-wider text-[#888880] bg-[#151515] px-2 py-0.5 rounded"
-                      >
-                        {perk}
+              {!submitted ? (
+                <>
+                  {/* Header */}
+                  <div className="mb-6">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#e8a838]/10 border border-[#e8a838]/20 rounded-full mb-4">
+                      <Sparkles className="h-3 w-3 text-[#e8a838]" />
+                      <span className="text-[9px] uppercase tracking-[0.2em] text-[#e8a838] font-semibold">
+                        First visit free
                       </span>
-                    )
-                  )}
-                </div>
-              </div>
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-bold text-[#f5f0e8] tracking-tight mb-2">
+                      Let&apos;s get you<br />
+                      <span className="text-[#e8a838]">set up.</span>
+                    </h3>
+                    <p className="text-sm text-[#888880] font-light leading-relaxed">
+                      Tell us a bit about yourself and what needs fixing.
+                      We&apos;ll reach out within 24 hours to schedule your free first visit.
+                    </p>
+                  </div>
 
-              {/* Form */}
-              <form onSubmit={handleCheckout} className="space-y-3">
-                <input
-                  type="email"
-                  placeholder="Email address"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors"
-                />
+                  {/* Form */}
+                  <form onSubmit={handleSubmit} className="space-y-3">
+                    <input
+                      type="text"
+                      placeholder="Your name *"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email address *"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Phone number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Zip code"
+                      value={zip}
+                      onChange={(e) => setZip(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors"
+                    />
+                    <textarea
+                      placeholder="What needs fixing? (leaky faucet, mount a TV, squeaky door...)"
+                      value={firstFix}
+                      onChange={(e) => setFirstFix(e.target.value)}
+                      rows={3}
+                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors resize-none"
+                    />
 
-                {error && (
-                  <p className="text-xs text-red-400 px-1">{error}</p>
-                )}
+                    {error && (
+                      <p className="text-xs text-red-400 px-1">{error}</p>
+                    )}
 
-                <motion.button
-                  type="submit"
-                  disabled={loading}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full py-3.5 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-xl hover:bg-[#f5bc5c] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                    <motion.button
+                      type="submit"
+                      disabled={loading}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full py-3.5 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-xl hover:bg-[#f5bc5c] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                    >
+                      {loading ? (
+                        <div className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          Get My Free First Visit
+                          <ArrowRight className="h-4 w-4" />
+                        </>
+                      )}
+                    </motion.button>
+                  </form>
+
+                  <div className="mt-5 flex items-center justify-center gap-4 text-[10px] text-[#555]">
+                    <span>No credit card required</span>
+                    <span>•</span>
+                    <span>We&apos;ll call within 24hrs</span>
+                  </div>
+                </>
+              ) : (
+                /* Success state */
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-4"
                 >
-                  {loading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
-                      Redirecting to checkout...
-                    </>
-                  ) : (
-                    <>
-                      Continue to Payment
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </motion.button>
-              </form>
-
-              <div className="mt-5 flex items-center justify-center gap-4 text-[10px] text-[#555]">
-                <span className="flex items-center gap-1">
-                  <Shield className="h-3 w-3" /> Secure checkout via Stripe
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <Users className="h-3 w-3" /> 23 spots left
-                </span>
-              </div>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                    className="w-16 h-16 bg-[#e8a838]/10 border border-[#e8a838]/20 rounded-full flex items-center justify-center mx-auto mb-5"
+                  >
+                    <Check className="h-7 w-7 text-[#e8a838]" />
+                  </motion.div>
+                  <h3 className="text-2xl font-bold text-[#f5f0e8] mb-2">
+                    You&apos;re in, {name.split(' ')[0]}!
+                  </h3>
+                  <p className="text-sm text-[#888880] font-light leading-relaxed mb-4">
+                    We&apos;ll reach out within 24 hours to match you with
+                    your handyman and schedule your free first visit.
+                  </p>
+                  <div className="space-y-2 text-left bg-[#0a0a0a] rounded-xl p-4 mb-4">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#e8a838] font-semibold mb-3">What happens next</p>
+                    {[
+                      'We call you to learn about your home',
+                      'We match you with a dedicated handyman',
+                      'You schedule your free first visit',
+                      'If you love it, membership is $99/mo after that',
+                    ].map((step, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-full bg-[#e8a838]/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-[9px] text-[#e8a838] font-bold">{i + 1}</span>
+                        </div>
+                        <span className="text-xs text-[#c8c8c0]">{step}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[#e8a838]">
+                    Check your email for confirmation.
+                  </p>
+                </motion.div>
+              )}
             </div>
           </motion.div>
         </>
@@ -284,7 +306,7 @@ function Nav({ onJoin }: { onJoin: () => void }) {
             onClick={onJoin}
             className="px-5 py-2 bg-[#e8a838] text-[#0a0a0a] text-xs uppercase tracking-widest font-semibold rounded-full hover:bg-[#f5bc5c] transition-colors"
           >
-            Join — $99/mo
+            Get Started Free
           </button>
         </div>
 
@@ -316,7 +338,7 @@ function Nav({ onJoin }: { onJoin: () => void }) {
                 onClick={() => { setMenuOpen(false); onJoin(); }}
                 className="mt-2 px-5 py-2.5 bg-[#e8a838] text-[#0a0a0a] text-xs uppercase tracking-widest font-semibold rounded-full w-fit"
               >
-                Join — $99/mo
+                Get Started Free
               </button>
             </div>
           </motion.div>
@@ -376,7 +398,7 @@ function Hero({ onJoin }: { onJoin: () => void }) {
         >
           <Sparkles className="h-3 w-3 text-[#e8a838]" />
           <span className="text-[10px] uppercase tracking-[0.2em] text-[#e8a838]">
-            Founding members — first month free
+            Your first visit is free
           </span>
         </motion.div>
 
@@ -416,22 +438,16 @@ function Hero({ onJoin }: { onJoin: () => void }) {
             whileTap={{ scale: 0.97 }}
             className="group px-8 py-3.5 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-full flex items-center gap-3 hover:bg-[#f5bc5c] transition-colors"
           >
-            Claim Your Spot
+            Get Your Free First Visit
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </motion.button>
-          <div className="flex items-center gap-3">
-            <a
-              href="#how"
-              className="text-sm text-[#888880] hover:text-[#f5f0e8] transition-colors flex items-center gap-2"
-            >
-              See how it works
-              <ChevronDown className="h-4 w-4" />
-            </a>
-            <span className="text-[#2a2a2a]">|</span>
-            <span className="text-xs text-[#555] flex items-center gap-1.5">
-              <Users className="h-3 w-3" /> 23 of 50 spots left
-            </span>
-          </div>
+          <a
+            href="#how"
+            className="text-sm text-[#888880] hover:text-[#f5f0e8] transition-colors flex items-center gap-2"
+          >
+            See how it works
+            <ChevronDown className="h-4 w-4" />
+          </a>
         </motion.div>
 
         {/* Stats ticker */}
@@ -442,7 +458,7 @@ function Hero({ onJoin }: { onJoin: () => void }) {
           className="mt-16 flex items-center justify-center gap-8 sm:gap-16"
         >
           {[
-            { num: '$0', label: 'First month for founders' },
+            { num: 'Free', label: 'First visit, on us' },
             { num: '24hr', label: 'Scheduling window' },
             { num: '$0', label: 'Call-out fee' },
           ].map((stat, i) => (
@@ -857,7 +873,7 @@ function Pricing({ onJoin }: { onJoin: () => void }) {
           {/* Badge */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#e8a838] text-[#0a0a0a] text-[9px] uppercase tracking-[0.2em] font-bold rounded-full whitespace-nowrap flex items-center gap-1.5">
             <Sparkles className="h-3 w-3" />
-            Founding member — 1st month free
+            First visit free — no commitment
           </div>
 
           <div className="text-center mb-10">
@@ -924,18 +940,12 @@ function Pricing({ onJoin }: { onJoin: () => void }) {
             whileTap={{ scale: 0.98 }}
             className="w-full py-4 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-full hover:bg-[#f5bc5c] transition-colors"
           >
-            Claim Your Spot — First Month Free
+            Get Your Free First Visit
           </motion.button>
 
           <p className="text-center text-[10px] text-[#888880] mt-4">
-            No credit card to join the waitlist. First visit within 48 hours of launch.
+            No credit card required. We&apos;ll call you within 24 hours to schedule.
           </p>
-          <div className="flex items-center justify-center gap-1.5 mt-2">
-            <Users className="h-3 w-3 text-[#555]" />
-            <p className="text-center text-[10px] text-[#555]">
-              23 of 50 founding spots remaining
-            </p>
-          </div>
         </motion.div>
 
         {/* Comparison nudge */}
@@ -1169,8 +1179,8 @@ function FinalCTA({ onJoin }: { onJoin: () => void }) {
             <span className="text-[#e8a838]">&ldquo;handyman near me.&rdquo;</span>
           </h2>
           <p className="text-base sm:text-lg text-[#888880] font-light max-w-lg mx-auto mb-10 leading-relaxed">
-            Join the founding 50 and lock in $99/mo for life.
-            Your first month is on us.
+            Tell us what needs fixing. Your first visit is free — 
+            no credit card, no commitment. Just results.
           </p>
 
           <motion.button
@@ -1179,21 +1189,13 @@ function FinalCTA({ onJoin }: { onJoin: () => void }) {
             whileTap={{ scale: 0.97 }}
             className="group px-10 py-4 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-full flex items-center gap-3 mx-auto hover:bg-[#f5bc5c] transition-colors"
           >
-            Join for $99/mo
+            Get Your Free First Visit
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </motion.button>
 
-          <div className="mt-5 flex items-center justify-center gap-3 text-[10px] text-[#555]">
-            <span className="flex items-center gap-1">
-              <Shield className="h-3 w-3" /> Secure checkout
-            </span>
-            <span>•</span>
-            <span>Cancel anytime</span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <Users className="h-3 w-3" /> 23 spots left
-            </span>
-          </div>
+          <p className="mt-5 text-[10px] text-[#555]">
+            Takes 30 seconds. We&apos;ll call you within 24 hours.
+          </p>
         </motion.div>
       </div>
     </section>
@@ -1249,7 +1251,7 @@ export default function Home() {
       <FAQ />
       <FinalCTA onJoin={openWaitlist} />
       <Footer />
-      <SignupModal isOpen={waitlistOpen} onClose={closeWaitlist} />
+      <LeadModal isOpen={waitlistOpen} onClose={closeWaitlist} />
     </>
   );
 }

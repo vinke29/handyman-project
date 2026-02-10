@@ -35,7 +35,7 @@ export default function SuccessPage() {
           transition={{ delay: 0.4 }}
           className="text-4xl sm:text-5xl font-bold tracking-tight text-[#f5f0e8] mb-4"
         >
-          Welcome to the club.
+          You&apos;re all set.
         </motion.h1>
 
         <motion.p
@@ -44,8 +44,8 @@ export default function SuccessPage() {
           transition={{ delay: 0.6 }}
           className="text-base text-[#888880] font-light leading-relaxed mb-10"
         >
-          Your membership is active. You&apos;re one of the founding 50 — 
-          your rate is locked at $99/mo for life, and your first month is on us.
+          We&apos;ve got your info. A real person from our team will
+          reach out within 24 hours to get you set up.
         </motion.p>
 
         {/* What happens next */}
@@ -64,7 +64,7 @@ export default function SuccessPage() {
               {
                 icon: Phone,
                 title: 'We\'ll call you within 24 hours',
-                desc: 'Quick intro, learn about your home, answer any questions.',
+                desc: 'Quick intro call — learn about your home, answer your questions.',
               },
               {
                 icon: Wrench,
@@ -73,13 +73,13 @@ export default function SuccessPage() {
               },
               {
                 icon: Calendar,
-                title: 'Schedule your first visit',
-                desc: 'Pick a time that works. We\'ll be there.',
+                title: 'Schedule your free first visit',
+                desc: 'Pick a time that works. Up to 2 hours, completely on us.',
               },
               {
                 icon: MessageCircle,
-                title: 'Text them directly',
-                desc: 'From day one, you can message your handyman anytime.',
+                title: 'Love it? Join for $99/mo',
+                desc: 'If you\'re happy, the membership is $99/mo after that. Cancel anytime.',
               },
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-4">
