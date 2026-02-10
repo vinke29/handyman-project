@@ -73,13 +73,13 @@ export default function SuccessPage() {
               },
               {
                 icon: Calendar,
-                title: 'Schedule your free first visit',
-                desc: 'Pick a time that works. Up to 2 hours, completely on us.',
+                title: 'Schedule your $29 first visit',
+                desc: 'Pick a time that works. Up to 2 hours of real work — pay at the visit.',
               },
               {
                 icon: MessageCircle,
-                title: 'Love it? Join for $99/mo',
-                desc: 'If you\'re happy, the membership is $99/mo after that. Cancel anytime.',
+                title: 'Love it? Membership is $99/mo',
+                desc: 'If you\'re happy, keep your handyman for $99/mo. No pressure. Cancel anytime.',
               },
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-4">

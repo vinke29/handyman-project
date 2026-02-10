@@ -123,7 +123,7 @@ function LeadModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#e8a838]/10 border border-[#e8a838]/20 rounded-full mb-4">
                       <Sparkles className="h-3 w-3 text-[#e8a838]" />
                       <span className="text-[9px] uppercase tracking-[0.2em] text-[#e8a838] font-semibold">
-                        First visit free
+                        First visit — just $29
                       </span>
                     </div>
                     <h3 className="text-2xl sm:text-3xl font-bold text-[#f5f0e8] tracking-tight mb-2">
@@ -132,7 +132,7 @@ function LeadModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                     </h3>
                     <p className="text-sm text-[#888880] font-light leading-relaxed">
                       Tell us a bit about yourself and what needs fixing.
-                      We&apos;ll reach out within 24 hours to schedule your free first visit.
+                      We&apos;ll reach out within 24 hours to schedule your first visit. Just $29 — no commitment after that.
                     </p>
                   </div>
 
@@ -191,7 +191,7 @@ function LeadModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                         <div className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
                       ) : (
                         <>
-                          Get My Free First Visit
+                          Book My $29 First Visit
                           <ArrowRight className="h-4 w-4" />
                         </>
                       )}
@@ -199,7 +199,7 @@ function LeadModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                   </form>
 
                   <div className="mt-5 flex items-center justify-center gap-4 text-[10px] text-[#555]">
-                    <span>No credit card required</span>
+                    <span>$29 paid at the visit</span>
                     <span>•</span>
                     <span>We&apos;ll call within 24hrs</span>
                   </div>
@@ -224,14 +224,14 @@ function LeadModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                   </h3>
                   <p className="text-sm text-[#888880] font-light leading-relaxed mb-4">
                     We&apos;ll reach out within 24 hours to match you with
-                    your handyman and schedule your free first visit.
+                    your handyman and schedule your $29 first visit.
                   </p>
                   <div className="space-y-2 text-left bg-[#0a0a0a] rounded-xl p-4 mb-4">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-[#e8a838] font-semibold mb-3">What happens next</p>
                     {[
                       'We call you to learn about your home',
                       'We match you with a dedicated handyman',
-                      'You schedule your free first visit',
+                      'You schedule your $29 first visit (2 hrs)',
                       'If you love it, membership is $99/mo after that',
                     ].map((step, i) => (
                       <div key={i} className="flex items-center gap-2">
@@ -306,7 +306,7 @@ function Nav({ onJoin }: { onJoin: () => void }) {
             onClick={onJoin}
             className="px-5 py-2 bg-[#e8a838] text-[#0a0a0a] text-xs uppercase tracking-widest font-semibold rounded-full hover:bg-[#f5bc5c] transition-colors"
           >
-            Get Started Free
+            Get Started — $29
           </button>
         </div>
 
@@ -338,7 +338,7 @@ function Nav({ onJoin }: { onJoin: () => void }) {
                 onClick={() => { setMenuOpen(false); onJoin(); }}
                 className="mt-2 px-5 py-2.5 bg-[#e8a838] text-[#0a0a0a] text-xs uppercase tracking-widest font-semibold rounded-full w-fit"
               >
-                Get Started Free
+                Get Started — $29
               </button>
             </div>
           </motion.div>
@@ -398,7 +398,7 @@ function Hero({ onJoin }: { onJoin: () => void }) {
         >
           <Sparkles className="h-3 w-3 text-[#e8a838]" />
           <span className="text-[10px] uppercase tracking-[0.2em] text-[#e8a838]">
-            Your first visit is free
+            Your first visit is just $29
           </span>
         </motion.div>
 
@@ -438,7 +438,7 @@ function Hero({ onJoin }: { onJoin: () => void }) {
             whileTap={{ scale: 0.97 }}
             className="group px-8 py-3.5 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-full flex items-center gap-3 hover:bg-[#f5bc5c] transition-colors"
           >
-            Get Your Free First Visit
+            Try It for $29
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </motion.button>
           <a
@@ -458,7 +458,7 @@ function Hero({ onJoin }: { onJoin: () => void }) {
           className="mt-16 flex items-center justify-center gap-8 sm:gap-16"
         >
           {[
-            { num: 'Free', label: 'First visit, on us' },
+            { num: '$29', label: 'First visit, no strings' },
             { num: '24hr', label: 'Scheduling window' },
             { num: '$0', label: 'Call-out fee' },
           ].map((stat, i) => (
@@ -873,7 +873,7 @@ function Pricing({ onJoin }: { onJoin: () => void }) {
           {/* Badge */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#e8a838] text-[#0a0a0a] text-[9px] uppercase tracking-[0.2em] font-bold rounded-full whitespace-nowrap flex items-center gap-1.5">
             <Sparkles className="h-3 w-3" />
-            First visit free — no commitment
+            First visit just $29 — no commitment
           </div>
 
           <div className="text-center mb-10">
@@ -940,11 +940,11 @@ function Pricing({ onJoin }: { onJoin: () => void }) {
             whileTap={{ scale: 0.98 }}
             className="w-full py-4 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-full hover:bg-[#f5bc5c] transition-colors"
           >
-            Get Your Free First Visit
+            Try It for $29
           </motion.button>
 
           <p className="text-center text-[10px] text-[#888880] mt-4">
-            No credit card required. We&apos;ll call you within 24 hours to schedule.
+            No commitment after. We&apos;ll call you within 24 hours to schedule.
           </p>
         </motion.div>
 
@@ -1179,8 +1179,8 @@ function FinalCTA({ onJoin }: { onJoin: () => void }) {
             <span className="text-[#e8a838]">&ldquo;handyman near me.&rdquo;</span>
           </h2>
           <p className="text-base sm:text-lg text-[#888880] font-light max-w-lg mx-auto mb-10 leading-relaxed">
-            Tell us what needs fixing. Your first visit is free — 
-            no credit card, no commitment. Just results.
+            Tell us what needs fixing. Your first visit is just $29 — 
+            that&apos;s 2 hours of real work, no commitment after.
           </p>
 
           <motion.button
@@ -1189,12 +1189,12 @@ function FinalCTA({ onJoin }: { onJoin: () => void }) {
             whileTap={{ scale: 0.97 }}
             className="group px-10 py-4 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-full flex items-center gap-3 mx-auto hover:bg-[#f5bc5c] transition-colors"
           >
-            Get Your Free First Visit
+            Try It for $29
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </motion.button>
 
           <p className="mt-5 text-[10px] text-[#555]">
-            Takes 30 seconds. We&apos;ll call you within 24 hours.
+            Takes 30 seconds. We&apos;ll call within 24 hours. Pay at the visit.
           </p>
         </motion.div>
       </div>
