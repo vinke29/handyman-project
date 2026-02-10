@@ -32,33 +32,48 @@ import {
   Users,
 } from 'lucide-react';
 
-// ─── WAITLIST MODAL ─────────────────────────────────────────────────────────
+// ─── SIGNUP MODAL ───────────────────────────────────────────────────────────
 
-function WaitlistModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function SignupModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [zip, setZip] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [plan, setPlan] = useState<'monthly' | 'annual'>('monthly');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    // Simulate API call — replace with real endpoint later
-    await new Promise(resolve => setTimeout(resolve, 800));
-    setLoading(false);
-    setSubmitted(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan, email }),
+      });
+
+      const data = await res.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setError(data.error || 'Something went wrong. Please try again.');
+        setLoading(false);
+      }
+    } catch {
+      setError('Network error. Please try again.');
+      setLoading(false);
+    }
   };
 
   // Reset on close
   useEffect(() => {
     if (!isOpen) {
       setTimeout(() => {
-        setSubmitted(false);
         setEmail('');
-        setName('');
-        setZip('');
+        setPlan('monthly');
+        setError('');
       }, 300);
     }
   }, [isOpen]);
@@ -94,92 +109,122 @@ function WaitlistModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 <X className="h-5 w-5" />
               </button>
 
-              {!submitted ? (
-                <>
-                  {/* Header */}
-                  <div className="mb-8">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#e8a838]/10 border border-[#e8a838]/20 rounded-full mb-4">
-                      <Sparkles className="h-3 w-3 text-[#e8a838]" />
-                      <span className="text-[9px] uppercase tracking-[0.2em] text-[#e8a838] font-semibold">
-                        Founding Member
-                      </span>
-                    </div>
-                    <h3 className="text-2xl sm:text-3xl font-bold text-[#f5f0e8] tracking-tight mb-2">
-                      Lock in $99/mo<br />
-                      <span className="text-[#e8a838]">for life.</span>
-                    </h3>
-                    <p className="text-sm text-[#888880] font-light leading-relaxed">
-                      First 50 founding members get the $99/mo rate locked forever — 
-                      plus your first month free. Price goes up after that.
-                    </p>
-                  </div>
+              {/* Header */}
+              <div className="mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#e8a838]/10 border border-[#e8a838]/20 rounded-full mb-4">
+                  <Sparkles className="h-3 w-3 text-[#e8a838]" />
+                  <span className="text-[9px] uppercase tracking-[0.2em] text-[#e8a838] font-semibold">
+                    Founding Member
+                  </span>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-[#f5f0e8] tracking-tight mb-2">
+                  Join the club.
+                </h3>
+                <p className="text-sm text-[#888880] font-light leading-relaxed">
+                  Founding members lock in $99/mo for life.
+                  Your first month is free.
+                </p>
+              </div>
 
-                  {/* Form */}
-                  <form onSubmit={handleSubmit} className="space-y-3">
-                    <input
-                      type="text"
-                      placeholder="First name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email address *"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Zip code"
-                      value={zip}
-                      onChange={(e) => setZip(e.target.value)}
-                      className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors"
-                    />
-                    <motion.button
-                      type="submit"
-                      disabled={loading}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full py-3.5 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-xl hover:bg-[#f5bc5c] transition-colors disabled:opacity-60"
-                    >
-                      {loading ? 'Joining...' : 'Claim My Spot'}
-                    </motion.button>
-                  </form>
-
-                  <div className="mt-5 flex items-center justify-center gap-4 text-[10px] text-[#555]">
-                    <span className="flex items-center gap-1">
-                      <Users className="h-3 w-3" /> 23 spots left
-                    </span>
-                    <span>•</span>
-                    <span>No credit card required</span>
-                  </div>
-                </>
-              ) : (
-                /* Success state */
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-6"
+              {/* Plan toggle */}
+              <div className="flex bg-[#0a0a0a] rounded-xl p-1 mb-5">
+                <button
+                  onClick={() => setPlan('monthly')}
+                  className={`flex-1 py-2.5 rounded-lg text-xs uppercase tracking-widest font-semibold transition-all ${
+                    plan === 'monthly'
+                      ? 'bg-[#1e1e1e] text-[#f5f0e8] shadow-sm'
+                      : 'text-[#555] hover:text-[#888880]'
+                  }`}
                 >
-                  <div className="w-16 h-16 bg-[#e8a838]/10 rounded-full flex items-center justify-center mx-auto mb-5">
-                    <Check className="h-7 w-7 text-[#e8a838]" />
+                  $99/mo
+                </button>
+                <button
+                  onClick={() => setPlan('annual')}
+                  className={`flex-1 py-2.5 rounded-lg text-xs uppercase tracking-widest font-semibold transition-all relative ${
+                    plan === 'annual'
+                      ? 'bg-[#1e1e1e] text-[#f5f0e8] shadow-sm'
+                      : 'text-[#555] hover:text-[#888880]'
+                  }`}
+                >
+                  $84/mo
+                  <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-[#e8a838] text-[#0a0a0a] text-[7px] uppercase tracking-wider font-bold rounded-full">
+                    -15%
+                  </span>
+                </button>
+              </div>
+
+              {/* Plan details */}
+              <div className="mb-5 p-3 bg-[#0a0a0a] rounded-xl border border-[#1e1e1e]">
+                <div className="flex items-baseline justify-between">
+                  <div>
+                    <span className="text-2xl font-bold text-[#f5f0e8]">
+                      ${plan === 'annual' ? '84' : '99'}
+                    </span>
+                    <span className="text-sm text-[#888880]">/mo</span>
                   </div>
-                  <h3 className="text-2xl font-bold text-[#f5f0e8] mb-2">You&apos;re in!</h3>
-                  <p className="text-sm text-[#888880] font-light leading-relaxed mb-1">
-                    Welcome to the founding members list.
-                  </p>
-                  <p className="text-sm text-[#888880] font-light leading-relaxed">
-                    We&apos;ll reach out at <span className="text-[#f5f0e8]">{email}</span> when
-                    we&apos;re ready to onboard you.
-                  </p>
-                  <p className="mt-5 text-xs text-[#e8a838]">
-                    Your $99/mo rate is locked. First month free.
-                  </p>
-                </motion.div>
-              )}
+                  <span className="text-[10px] text-[#888880]">
+                    {plan === 'annual' ? 'Billed $1,008/yr' : 'Billed monthly'}
+                  </span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {['1 visit/mo', '2 hrs each', 'Same handyman', 'Cancel anytime'].map(
+                    (perk) => (
+                      <span
+                        key={perk}
+                        className="text-[9px] uppercase tracking-wider text-[#888880] bg-[#151515] px-2 py-0.5 rounded"
+                      >
+                        {perk}
+                      </span>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleCheckout} className="space-y-3">
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors"
+                />
+
+                {error && (
+                  <p className="text-xs text-red-400 px-1">{error}</p>
+                )}
+
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full py-3.5 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-xl hover:bg-[#f5bc5c] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
+                      Redirecting to checkout...
+                    </>
+                  ) : (
+                    <>
+                      Continue to Payment
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </motion.button>
+              </form>
+
+              <div className="mt-5 flex items-center justify-center gap-4 text-[10px] text-[#555]">
+                <span className="flex items-center gap-1">
+                  <Shield className="h-3 w-3" /> Secure checkout via Stripe
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <Users className="h-3 w-3" /> 23 spots left
+                </span>
+              </div>
             </div>
           </motion.div>
         </>
@@ -1098,19 +1143,6 @@ function FAQ() {
 // ─── FINAL CTA ──────────────────────────────────────────────────────────────
 
 function FinalCTA({ onJoin }: { onJoin: () => void }) {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleInlineSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) { onJoin(); return; }
-    setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    setLoading(false);
-    setSubmitted(true);
-  };
-
   return (
     <section className="py-32 px-6 md:px-12 relative overflow-hidden">
       {/* Background glow */}
@@ -1141,43 +1173,27 @@ function FinalCTA({ onJoin }: { onJoin: () => void }) {
             Your first month is on us.
           </p>
 
-          {!submitted ? (
-            <div className="max-w-md mx-auto">
-              <form onSubmit={handleInlineSubmit} className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 px-5 py-3.5 bg-[#151515] border border-[#2a2a2a] rounded-full text-sm text-[#f5f0e8] placeholder-[#555] focus:outline-none focus:border-[#e8a838]/40 transition-colors"
-                />
-                <motion.button
-                  type="submit"
-                  disabled={loading}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="px-6 py-3.5 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-full hover:bg-[#f5bc5c] transition-colors whitespace-nowrap disabled:opacity-60"
-                >
-                  {loading ? '...' : 'Join'}
-                </motion.button>
-              </form>
-              <p className="mt-4 text-[10px] text-[#888880]">
-                No credit card required. 23 of 50 founding spots left.
-              </p>
-            </div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="max-w-md mx-auto"
-            >
-              <div className="p-6 bg-[#151515] border border-[#e8a838]/20 rounded-2xl">
-                <Check className="h-6 w-6 text-[#e8a838] mx-auto mb-3" />
-                <p className="text-sm text-[#f5f0e8] font-semibold mb-1">You&apos;re on the list!</p>
-                <p className="text-xs text-[#888880]">We&apos;ll email you at <span className="text-[#f5f0e8]">{email}</span> when it&apos;s go time.</p>
-              </div>
-            </motion.div>
-          )}
+          <motion.button
+            onClick={onJoin}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            className="group px-10 py-4 bg-[#e8a838] text-[#0a0a0a] text-sm uppercase tracking-widest font-semibold rounded-full flex items-center gap-3 mx-auto hover:bg-[#f5bc5c] transition-colors"
+          >
+            Join for $99/mo
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          </motion.button>
+
+          <div className="mt-5 flex items-center justify-center gap-3 text-[10px] text-[#555]">
+            <span className="flex items-center gap-1">
+              <Shield className="h-3 w-3" /> Secure checkout
+            </span>
+            <span>•</span>
+            <span>Cancel anytime</span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <Users className="h-3 w-3" /> 23 spots left
+            </span>
+          </div>
         </motion.div>
       </div>
     </section>
@@ -1233,7 +1249,7 @@ export default function Home() {
       <FAQ />
       <FinalCTA onJoin={openWaitlist} />
       <Footer />
-      <WaitlistModal isOpen={waitlistOpen} onClose={closeWaitlist} />
+      <SignupModal isOpen={waitlistOpen} onClose={closeWaitlist} />
     </>
   );
 }
