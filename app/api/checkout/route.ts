@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +8,8 @@ export async function POST(req: NextRequest) {
 
     const isAnnual = plan === 'annual';
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3003';
+
+    const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
