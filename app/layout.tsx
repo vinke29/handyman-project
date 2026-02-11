@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Handyman Club — Home Care, Handled.",
-  description: "A premium handyman subscription service. One membership, every fix.",
+  title: "Handyman Club — Your Handyman, On Speed Dial.",
+  description:
+    "One dedicated handyman who knows your home. $29 first visit, then $99/mo for monthly service — 24-hour scheduling, no call-out fees. Raleigh-Durham.",
+  metadataBase: new URL("https://homefix.team"),
+  openGraph: {
+    title: "Handyman Club — Your Handyman, On Speed Dial.",
+    description:
+      "One dedicated handyman who knows your home. $29 first visit, then $99/mo — 24-hour scheduling, no call-out fees.",
+    url: "https://homefix.team",
+    siteName: "Handyman Club",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Handyman Club — Your Handyman, On Speed Dial.",
+    description:
+      "One dedicated handyman who knows your home. $29 first visit, then $99/mo — 24-hour scheduling, no call-out fees.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -28,6 +50,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
