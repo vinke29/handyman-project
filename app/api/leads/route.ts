@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       if (notificationEmail) {
         const resend = getResend();
         await resend.emails.send({
-          from: 'Handyman Club <leads@homefix.team>',
+          from: 'HomeFix <leads@homefix.team>',
           to: notificationEmail,
           subject: `New Lead: ${name}`,
           html: `

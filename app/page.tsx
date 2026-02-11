@@ -284,7 +284,7 @@ function Nav({ onJoin }: { onJoin: () => void }) {
             <Wrench className="h-4 w-4 text-[#0a0a0a]" />
           </div>
           <span className="text-sm font-semibold tracking-wide uppercase text-[#f5f0e8]">
-            Handyman Club
+            HomeFix
           </span>
         </a>
 
@@ -1213,11 +1213,11 @@ function Footer() {
             <Wrench className="h-3 w-3 text-[#0a0a0a]" />
           </div>
           <span className="text-xs font-semibold tracking-wide uppercase text-[#888880]">
-            Handyman Club
+            HomeFix
           </span>
         </div>
         <p className="text-xs text-[#888880]">
-          © {new Date().getFullYear()} Handyman Club. All rights reserved.
+          © {new Date().getFullYear()} HomeFix. All rights reserved.
         </p>
         <div className="flex gap-6">
           <a href="#" className="text-xs text-[#888880] hover:text-[#f5f0e8] transition-colors">Privacy</a>
