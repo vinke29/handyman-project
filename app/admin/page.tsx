@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { RefreshCw, LogOut, Users, CalendarCheck } from 'lucide-react';
+import { RefreshCw, LogOut, Users, CalendarCheck, Link, Check } from 'lucide-react';
 
 interface Lead {
   id: number;
@@ -25,6 +25,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>({ total: 0, todayCount: 0 });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [linkLoading, setLinkLoading] = useState<string | null>(null);
 
   const fetchLeads = useCallback(async () => {
     try {
@@ -56,6 +58,27 @@ export default function AdminDashboard() {
   async function handleLogout() {
     await fetch('/api/admin/logout', { method: 'POST' });
     router.push('/admin/login');
+  }
+
+  async function generatePaymentLink(type: 'first-visit' | 'membership') {
+    setLinkLoading(type);
+    try {
+      const res = await fetch(`/api/admin/stripe?type=${type}`, { method: 'POST' });
+      if (res.status === 401) {
+        router.push('/admin/login');
+        return;
+      }
+      const data = await res.json();
+      if (data.url) {
+        await navigator.clipboard.writeText(data.url);
+        setCopied(type);
+        setTimeout(() => setCopied(null), 2000);
+      }
+    } catch (err) {
+      console.error('Failed to generate payment link:', err);
+    } finally {
+      setLinkLoading(null);
+    }
   }
 
   function formatDate(iso: string) {
@@ -114,6 +137,44 @@ export default function AdminDashboard() {
               <span className="text-sm text-[#888880]">Today&apos;s Leads</span>
             </div>
             <p className="text-3xl font-bold">{loading ? '—' : stats.todayCount}</p>
+          </div>
+        </div>
+
+        {/* Payment Links */}
+        <div className="mb-8 p-6 bg-[#151515] border border-[#2a2a2a] rounded-2xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-xl bg-[#e8a838]/10 flex items-center justify-center">
+              <Link className="w-5 h-5 text-[#e8a838]" />
+            </div>
+            <h2 className="text-sm font-medium text-[#888880]">Payment Links</h2>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => generatePaymentLink('first-visit')}
+              disabled={linkLoading !== null}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#e8a838] text-[#0a0a0a] rounded-lg hover:bg-[#e8a838]/90 transition-colors disabled:opacity-50"
+            >
+              {copied === 'first-visit' ? (
+                <><Check className="w-4 h-4" /> Copied!</>
+              ) : linkLoading === 'first-visit' ? (
+                <><RefreshCw className="w-4 h-4 animate-spin" /> Generating...</>
+              ) : (
+                '$29 First Visit'
+              )}
+            </button>
+            <button
+              onClick={() => generatePaymentLink('membership')}
+              disabled={linkLoading !== null}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#e8a838] text-[#0a0a0a] rounded-lg hover:bg-[#e8a838]/90 transition-colors disabled:opacity-50"
+            >
+              {copied === 'membership' ? (
+                <><Check className="w-4 h-4" /> Copied!</>
+              ) : linkLoading === 'membership' ? (
+                <><RefreshCw className="w-4 h-4 animate-spin" /> Generating...</>
+              ) : (
+                '$99/mo Membership'
+              )}
+            </button>
           </div>
         </div>
 
