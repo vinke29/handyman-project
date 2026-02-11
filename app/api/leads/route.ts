@@ -78,6 +78,39 @@ export async function POST(req: NextRequest) {
       console.error('Resend email error:', err);
     }
 
+    // Send confirmation email to the lead
+    try {
+      const resend = getResend();
+      const firstName = name.split(' ')[0];
+      await resend.emails.send({
+        from: 'HomeFix <hello@homefix.team>',
+        to: email,
+        subject: `We got your request, ${firstName}!`,
+        html: `
+          <div style="font-family: system-ui, sans-serif; max-width: 500px; margin: 0 auto;">
+            <h2 style="color: #1a1a1a;">Hey ${firstName}, thanks for reaching out!</h2>
+            <p style="color: #555; line-height: 1.6;">
+              We received your request and a real person from our team will
+              call you within <strong>24 hours</strong> to get things rolling.
+            </p>
+            <h3 style="color: #1a1a1a; margin-top: 24px;">Here's what happens next:</h3>
+            <ol style="color: #555; line-height: 1.8;">
+              <li>We call you for a quick intro — learn about your home, answer your questions</li>
+              <li>We match you with a dedicated handyman in your area</li>
+              <li>You schedule your <strong>$29 first visit</strong> (2 hours of real work)</li>
+              <li>If you love it, membership is $99/mo after that — cancel anytime</li>
+            </ol>
+            <p style="color: #555; line-height: 1.6;">
+              In the meantime, if you have questions just reply to this email.
+            </p>
+            <p style="color: #555;">— The HomeFix Team</p>
+          </div>
+        `,
+      });
+    } catch (err) {
+      console.error('Confirmation email error:', err);
+    }
+
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     console.error('Lead submission error:', error);

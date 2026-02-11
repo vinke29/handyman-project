@@ -1220,9 +1220,8 @@ function Footer() {
           © {new Date().getFullYear()} HomeFix. All rights reserved.
         </p>
         <div className="flex gap-6">
-          <a href="#" className="text-xs text-[#888880] hover:text-[#f5f0e8] transition-colors">Privacy</a>
-          <a href="#" className="text-xs text-[#888880] hover:text-[#f5f0e8] transition-colors">Terms</a>
-          <a href="#" className="text-xs text-[#888880] hover:text-[#f5f0e8] transition-colors">Contact</a>
+          <a href="/about" className="text-xs text-[#888880] hover:text-[#f5f0e8] transition-colors">About</a>
+          <a href="/contact" className="text-xs text-[#888880] hover:text-[#f5f0e8] transition-colors">Contact</a>
         </div>
     </div>
     </footer>
