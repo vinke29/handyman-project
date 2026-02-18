@@ -388,7 +388,7 @@ function Hero({ onJoin }: { onJoin: () => void }) {
         className="absolute bottom-[20%] left-[5%] w-96 h-96 rounded-full bg-[#e8a838]/3 blur-3xl"
       />
 
-      <motion.div style={{ y, opacity, scale }} className="relative z-10 text-center px-6 max-w-5xl">
+      <motion.div style={{ y, opacity, scale }} className="relative z-10 text-center px-6 max-w-5xl mt-20">
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
